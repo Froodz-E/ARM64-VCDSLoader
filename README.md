@@ -1,9 +1,9 @@
 # ARM64 VCDSLoader
 
-**Native ARM64 VCDS 26.3 patcher for Snapdragon X (Windows on ARM).**
+**Native ARM64 VCDS 26.3 patcher — compatible with all Windows ARM64 devices, including Snapdragon X.**
 
 [![Status](https://img.shields.io/badge/status-verified_working-success?style=flat-square)](release/VCDS%20ARM64%20Patched.exe)
-[![Platform](https://img.shields.io/badge/platform-Windows%20ARM64%20%7C%20Snapdragon%20X-blue?style=flat-square)](#)
+[![Platform](https://img.shields.io/badge/platform-Windows%20ARM64-blue?style=flat-square)](#)
 [![VCDS](https://img.shields.io/badge/VCDS-26.3%20ARM64-orange?style=flat-square)](#)
 [![License](https://img.shields.io/badge/license-educational--only-lightgrey?style=flat-square)](#disclaimer)
 
@@ -73,7 +73,7 @@ VCDS calls a validation function (`FUN_140076ff0`) at startup that checks for an
 | ARM64 VCDS 26.3 analyzed (Ghidra 11.2.1) | ✅ |
 | Validation function identified (`FUN_140076ff0`) | ✅ |
 | Patch applied (`MOV X0,#0; RET` at file offset `0x763F0`) | ✅ |
-| Tested on Snapdragon X | ✅ |
+| Tested on ARM64 (Snapdragon X) | ✅ |
 | FTDI ARM64 driver (v2.12.36.20 WHQL) | ✅ |
 | HEX-V2 / HEX-NET support | ✅ Plug & play |
 | Pre-patched binary available | ✅ [Download](release/VCDS%20ARM64%20Patched.exe) |
