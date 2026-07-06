@@ -36,3 +36,6 @@ See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the full reverse-engineering brea
 ## License & Disclaimer
 
 For educational and research purposes only. VCDS is a registered trademark of Ross-Tech, LLC. Users must own a valid license.
+## Status: VERIFIED WORKING on Snapdragon X (2026-07-06)
+
+ARM64 VCDS 26.3 launches successfully after patch. License bypass at FUN_140076ff0 confirmed.
