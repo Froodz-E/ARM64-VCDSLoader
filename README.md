@@ -36,6 +36,16 @@ See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the full reverse-engineering brea
 ## License & Disclaimer
 
 For educational and research purposes only. VCDS is a registered trademark of Ross-Tech, LLC. Users must own a valid license.
+
+## Drivers
+
+**FTDI ARM64 VCP driver** (for legacy HEX-USB, Micro-CAN, KII-USB, KEY-USB, and FTDI-based clones):
+
+- 📦 `drivers/CDM-v2.12.36.20-for-ARM64-WHQL-Certified.zip`
+- See **[drivers/README.md](drivers/README.md)** for installation and cable compatibility
+
+**HEX-V2 and HEX-NET** users: no drivers needed! HEX-V2 uses HID (plug & play on ARM64), HEX-NET uses WiFi.
+
 ## Status: VERIFIED WORKING on Snapdragon X (2026-07-06)
 
 ARM64 VCDS 26.3 launches successfully after patch. License bypass at FUN_140076ff0 confirmed.
