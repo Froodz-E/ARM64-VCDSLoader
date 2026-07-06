@@ -486,7 +486,7 @@ If the bytes match, the file offset is correct and the patch can be safely appli
 - Section offset ratios produced false positives
 - Couldn't determine which blocks correspond to which patches
 
-**Code preserved at:** `arm64_loader.py` (lines 41-64 for entropy calculation, lines 83-151 for the matching logic)
+**Code preserved in early experimental versions:** entropy-based block search explored in initial prototypes; BL instruction tracing tested but abandoned in favor of Ghidra-level disassembly. These prototype files are not included in the public repo — they were superseded by the code-patching approach. See the git history for the iterative progression from data-patching → BL tracing → Ghidra analysis → code-patching.
 
 ### 6.2 arm64_loader_v2.py — BL Instruction Tracing
 
@@ -504,7 +504,7 @@ If the bytes match, the file offset is correct and the patch can be safely appli
 
 **Key insight gained:** This approach confirmed that Ghidra-level disassembly is the minimum viable tool for this analysis. Raw byte scanning can't resolve ARM64's indirect import calling convention (ADRP → LDR → BLR through the IAT).
 
-**Code preserved at:** `arm64_loader_v2.py` (lines 103-124 for BL scanning)
+**Code preserved in early experimental versions:** BL instruction tracing was implemented in prototype code. Not included in the public repo — superseded by the code-patching approach. See the git history for the full experimental progression.
 
 ---
 

@@ -81,10 +81,15 @@ ARM64-VCDSLoader/
 │   ├── USAGE.md                  # How to use the patcher
 │   └── TECHNICAL.md              # Deep dive: x86 loader, ARM64 analysis, Ghidra methodology
 ├── vcds_loader.py                # Main patcher script (production)
-├── arm64_loader.py               # Early experimental version (data-patching approach)
-├── arm64_loader_v2.py            # Intermediate version (BL instruction tracing)
 ├── pe_analyze.py                 # PE structure analysis utility
-└── .git/                         # Git repository
+├── verify.py                     # Post-patch verification script
+├── compare_bytes.py              # Byte comparison helper
+├── diff_check.py                 # Diff check helper
+├── drivers/                      # FTDI ARM64 driver package
+│   ├── README.md                 # Driver installation guide
+│   ├── ARM64/Release/            # ARM64-native driver binaries
+│   └── x86/                      # x86 reference DLL (for comparison)
+└── release/                      # Pre-patched binary downloads
 ```
 
 ---
@@ -94,17 +99,13 @@ ARM64-VCDSLoader/
 ```bash
 # 1. Install VCDS 26.3 ARM64 (from Ross-Tech or your source)
 
-# 2. Run the patcher
-python vcds_loader.py
+# 2. Run the patcher (see USAGE.md for detailed instructions)
+python vcds_loader.py --input VCDS.exeL --output VCDS_patched.exeL
 
-# 3. Launch VCDS
-#    Open: D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL
+# 3. Launch the patched VCDS
 
-# 4. (Optional) Restore original
-#    cp VCDS.exeL.bak VCDS.exeL
+# 4. (Optional) Restore original from the .orig.bin backup
 ```
-
-> **Note:** The patcher creates a `.bak` backup before modifying the binary. You can always restore to the original state.
 
 ---
 

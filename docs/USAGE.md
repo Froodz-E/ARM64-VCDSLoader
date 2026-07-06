@@ -39,18 +39,15 @@ How to patch and run VCDS 26.3 natively on Windows on ARM (Snapdragon X).
 
 ```bash
 # 1. Navigate to the patcher directory
-cd "D:\VCDS Test\arm64-loader"
+cd arm64-loader
 
-# 2. Edit vcds_loader.py: set VCDS_PATH to your ARM64 binary location
-#    Default: D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL
+# 2. Dry run first (no files modified)
+python vcds_loader.py --input "C:\Ross-Tech\VCDS\VCDS.exeL" --dry-run
 
-# 3. Dry run first
-python vcds_loader.py --dry-run
+# 3. Apply the patch
+python vcds_loader.py --input "C:\Ross-Tech\VCDS\VCDS.exeL" --output "VCDS_patched.exeL"
 
-# 4. Apply the patch
-python vcds_loader.py
-
-# 5. Launch VCDS from the ARM64 installation folder
+# 4. Launch the patched VCDS
 ```
 
 ---
@@ -63,7 +60,6 @@ Download and install the ARM64 build of VCDS 26.3. The installer typically place
 
 ```
 C:\Ross-Tech\VCDS\          (default)
-D:\VCDS Test\ARM64\         (custom)
 ```
 
 The key binary is `VCDS.exeL` — this is the main VCDS executable. On ARM64, it's a PE32+ binary compiled for `AArch64`.
@@ -75,25 +71,21 @@ The key binary is `VCDS.exeL` — this is the main VCDS executable. On ARM64, it
 Note the full path to your ARM64 `VCDS.exeL`:
 
 ```powershell
-# Example
-Get-ChildItem -Path "C:\Ross-Tech" -Recurse -Filter "VCDS.exeL"
+# Example: find VCDS.exeL anywhere on C:\
+Get-ChildItem -Path "C:\Ross-Tech" -Recurse -Filter "VCDS.exeL" 2>$null
 ```
 
-If you installed VCDS in a different location, update the `VCDS_PATH` variable in `vcds_loader.py`:
-
-```python
-VCDS_PATH = r"C:\Ross-Tech\VCDS\VCDS.exeL"
-```
+Common installation paths:
+- `C:\Ross-Tech\VCDS\VCDS.exeL` (default)
+- `C:\Program Files\Ross-Tech\VCDS\VCDS.exeL`
 
 ### 3. Configure the Patcher
 
-Open `vcds_loader.py` and verify:
+No configuration needed — the patcher takes the binary path as a command-line argument:
 
-```python
-VCDS_PATH = r"D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL"
+```bash
+python vcds_loader.py --input <path_to_VCDS.exeL> --output <output_path>
 ```
-
-Change the path if your VCDS installation differs.
 
 ### 4. Dry Run (Recommended)
 
@@ -107,29 +99,25 @@ Expected output:
 
 ```
 ============================================================
-  ARM64 VCDSLoader v0.1
-  Target: VCDS 26.3 ARM64 (Snapdragon X)
+  VCDSLoader — ARM64 VCDS.exeL License Bypass Patcher
 ============================================================
 
-[DRY RUN MODE] No changes will be written.
+[STEP 1] Parsing PE headers ...
+  ImageBase      : 0x0000000140000000
+  Machine        : ARM64 (0xAA64)
+  Sections       : 5
+    ...
 
-[+] Valid ARM64 PE binary (2,193,752 bytes)
+[STEP 2] Resolving patch offsets ...
+  Patch #2 RVA 0x76FF0 → file offset 0x763F0
+  Patch #1 file offset 0x1FA31B (fixed)
 
---- Version string (cosmetic) ---
-  Description: Unicode string 'ary/driver version' - cosmetic patch
-  File offset: 0x001FA31B
-  Size: 1 bytes
-  Original:  00
-  [DRY RUN] Would replace with: 00
+[STEP 3] Patch plan
+  ...
 
---- License validation function bypass ---
-  Description: FUN_140076ff0: Replace function prologue with MOV X0,#0; RET; NOP; NOP
-  File offset: 0x000763F0
-  Size: 16 bytes
-  Original:  F3 53 BE A9 F5 5B 01 A9 FD 7B BE A9 FD 03 00 91
-  [DRY RUN] Would replace with: 00 00 80 D2 C0 03 5F D6 1F 20 03 D5 1F 20 03 D5
-
-[DRY RUN] No changes written. Remove -n/--dry-run to apply.
+============================================================
+  DRY-RUN MODE — No files were modified.
+============================================================
 ```
 
 ### 5. Apply the Patch
@@ -137,50 +125,50 @@ Expected output:
 When the dry run looks correct, apply the patch:
 
 ```bash
-python vcds_loader.py
+python vcds_loader.py --input "C:\Ross-Tech\VCDS\VCDS.exeL" --output "VCDS_patched.exeL"
 ```
 
 The script will:
 1. Verify the binary is a valid ARM64 PE
-2. Create a backup at `VCDS.exeL.bak` (only on first run)
-3. Apply both patches in-place
-4. Confirm success
+2. Parse the PE headers and resolve patch offsets
+3. Back up the original bytes to `<output>.orig.bin`
+4. Apply the MOV X0,#0 + RET patch at the validation function
+5. Verify the patch was applied correctly
 
 Expected output:
 
 ```
 ============================================================
-  ARM64 VCDSLoader v0.1
-  Target: VCDS 26.3 ARM64 (Snapdragon X)
+  VCDSLoader — ARM64 VCDS.exeL License Bypass Patcher
 ============================================================
 
-[+] Valid ARM64 PE binary (2,193,752 bytes)
-[+] Backup created: D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL.bak
+[STEP 6] Writing patched binary to: VCDS_patched.exeL
+  Written 2,193,752 bytes.
 
---- Version string (cosmetic) ---
-  ...
-  PATCHED: 00
-
---- License validation function bypass ---
-  ...
-  PATCHED: 00 00 80 D2 C0 03 5F D6 1F 20 03 D5 1F 20 03 D5
+[STEP 7] Verifying patched binary ...
+  ✓ Patch #2 verified — MOV X0,#0 + RET in place.
 
 ============================================================
-[SUCCESS] Patched binary written: D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL
-  Backup: D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL.bak
-
-  To test: Launch VCDS.exeL from the ARM64 test folder.
-  To restore: cp VCDS.exeL.bak VCDS.exeL
+  PATCH COMPLETE
 ============================================================
+  Input  : C:\Ross-Tech\VCDS\VCDS.exeL
+  Output : VCDS_patched.exeL
+  Backup : VCDS_patched.exeL.orig.bin
+
+  Patch #1 (Version String): Documented — no binary change needed.
+  Patch #2 (License Bypass): FUN_140076ff0 → MOV X0,#0 ; RET
 ```
 
 ### 6. Launch VCDS
 
-Navigate to the VCDS installation directory and run `VCDS.exeL`:
+Copy the patched binary into your VCDS installation directory and run it:
 
 ```bash
+# Copy patched binary into VCDS installation
+copy VCDS_patched.exeL "C:\Ross-Tech\VCDS\VCDS.exeL"
+
 # From terminal:
-cd "D:\VCDS Test\ARM64\Installation\VCDS"
+cd "C:\Ross-Tech\VCDS"
 start VCDS.exeL
 ```
 
@@ -194,38 +182,37 @@ VCDS should launch without the "Interface Adapter Not Initialized" error. The ap
 
 | Flag | Alias | Description |
 |------|-------|-------------|
+| `--input` | `-i` | **(Required)** Path to the ARM64 `VCDS.exeL` binary to patch. |
+| `--output` | `-o` | Path for the patched output binary (default: `<input>.patched`). |
 | `--dry-run` | `-n` | Simulate patches without writing. Shows what WOULD change. |
-| `--force` | `-f` | Re-apply patches even if a `.bak` already exists. |
 
 ### Examples
 
 ```bash
 # Dry run: see what changes would be made
-python vcds_loader.py --dry-run
-python vcds_loader.py -n
+python vcds_loader.py --input VCDS.exeL --dry-run
 
-# Force re-patch (if already patched once)
-python vcds_loader.py -f
+# Apply patch (output defaults to VCDS.exeL.patched)
+python vcds_loader.py --input VCDS.exeL
 
-# Combine (dry run with force flag — useful for verification)
-python vcds_loader.py -n -f
+# Specifying a custom output path
+python vcds_loader.py -i VCDS.exeL -o patched\VCDS.exeL
 ```
 
 ---
 
 ## Restoring the Original Binary
 
-The patcher creates `VCDS.exeL.bak` on the first run. To restore:
+The patcher saves the original bytes to `<output>.orig.bin`. To restore:
 
 ```bash
-# Option 1: Copy backup over patched binary
-cp "D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL.bak" \
-   "D:\VCDS Test\ARM64\Installation\VCDS\VCDS.exeL"
+# Re-patch from the original binary (if you still have it)
+python vcds_loader.py --input VCDS.exeL.orig --output VCDS_restored.exeL
 
-# Option 2: Re-install VCDS
+# Or re-install VCDS from the original source
 ```
 
-> **Note:** If you run the patcher again without `--force`, it will refuse to patch (detects existing `.bak` backup). This is intentional — a safety mechanism to prevent accidental double-patching.
+> **Note:** The patcher saves the overwritten bytes (8 bytes) in `<output>.orig.bin`. This is for verification — to fully restore, keep a copy of the original binary.
 
 ---
 
@@ -241,7 +228,12 @@ You're pointing at the wrong build. VCDS ships an x64 build for Intel/AMD and an
 
 ### "Target not found"
 
-The `VCDS_PATH` in `vcds_loader.py` doesn't point to a valid file. Update it to your actual installation path.
+The `--input` path doesn't point to a valid file. Verify the path to your VCDS binary:
+
+```bash
+# Example
+dir "C:\Ross-Tech\VCDS\VCDS.exeL"
+```
 
 ### "Bytes at offset don't match expected!"
 
@@ -251,12 +243,6 @@ The binary's bytes at the patch location differ from what was expected. This can
 - The binary was modified post-installation
 
 **Solution:** Restore from backup (or reinstall) and try again. If the problem persists, the validation function may have been moved — re-analyze with Ghidra (see [TECHNICAL.md](TECHNICAL.md)).
-
-### "Binary already has a backup"
-
-You've already run the patcher once. Either:
-- Restore from backup and re-patch: `cp VCDS.exeL.bak VCDS.exeL` then retry
-- Force re-patch: `python vcds_loader.py --force`
 
 ### VCDS crashes after patching
 
@@ -283,7 +269,7 @@ Maybe. If Ross-Tech recompiles VCDS without changing the validation function's s
 1. Re-analyze the new binary in Ghidra
 2. Find the validation function (look for "Interface Adapter Not Initialized" string references)
 3. Calculate the new file offset
-4. Update the `PATCHES` list in `vcds_loader.py`
+4. Update the file offset in `vcds_loader.py`'s `TARGET_RVA` constant
 
 ### Can I use this on x86/x64 Windows?
 
@@ -291,7 +277,7 @@ No. The patch targets the ARM64 (`AArch64`) instruction set. x86/x64 CPUs use di
 
 ### Does this modify the Windows registry or system files?
 
-No. The patcher only modifies the `VCDS.exeL` file in the VCDS installation directory. It creates one backup file (`.bak`) in the same folder. No registry changes, no system file modifications.
+No. The patcher only writes a new patched binary file. It does not modify the original binary, the Windows registry, or any system files. One small backup file (`<output>.orig.bin`) is created containing the original 8 bytes that were overwritten.
 
 ### Is this tool legal?
 
