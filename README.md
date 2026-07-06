@@ -2,50 +2,41 @@
 
 Native ARM64 VCDS loader/patcher for **Snapdragon X Windows on ARM**.
 
-Patches the ARM64 VCDS 26.3 binary to bypass license validation, enabling native execution without x86 emulation.
+✅ Patched ARM64 VCDS 26.3 — launches natively, no emulation, no loader needed.
 
-## Quick Start
+## Download & Use
 
-```bash
-python vcds_loader.py          # Patch the ARM64 VCDS binary
-python vcds_loader.py -n       # Dry run (see what changes)
-```
+### 1. Get the Patched VCDS
+Download **[VCDS ARM64 Patched.exe](release/VCDS%20ARM64%20Patched.exe)** from the `release/` folder. This is VCDS 26.3 natively compiled for ARM64 with the license validation bypassed. Drop it into your VCDS installation folder and run it.
 
-## Documentation
+### 2. Install the FTDI ARM64 VCP Driver (for USB cables)
+If your cable connects via USB (HEX-USB, Micro-CAN, KII-USB, clones), download:
+- 📦 **[CDM-v2.12.36.20-for-ARM64-WHQL-Certified.zip](drivers/CDM-v2.12.36.20-for-ARM64-WHQL-Certified.zip)**
 
-| Document | Description |
-|----------|-------------|
-| **[docs/README.md](docs/README.md)** | Full project overview — background, approach, structure |
-| **[docs/USAGE.md](docs/USAGE.md)** | User guide — prerequisites, step-by-step, troubleshooting |
-| **[docs/TECHNICAL.md](docs/TECHNICAL.md)** | Technical deep dive — x86 loader internals, ARM64 code-patching, Ghidra methodology |
+Extract and install via Device Manager → "Have Disk" → select `FTDIBUS.inf` then `FTDIPORT.inf`.
+
+> **HEX-V2 or HEX-NET?** No driver needed — HEX-V2 is HID (plug & play), HEX-NET uses WiFi.
+
+### 3. Run
+Launch `VCDS ARM64 Patched.exe`. Connect cable, select COM port, done.
 
 ## How It Works
 
-The ARM64 VCDS binary calls a validation function (`FUN_140076ff0`) that checks for an approved interface. This patcher replaces the function's prologue with `MOV X0, #0; RET` — making it always return success. All license checks are bypassed at the source.
+The ARM64 VCDS calls a validation function (`FUN_140076ff0`) that checks for an approved interface. We replaced its prologue with `MOV X0, #0; RET` — always returns success. License checks skipped at the source.
 
-See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the full reverse-engineering breakdown.
+See **[docs/TECHNICAL.md](docs/TECHNICAL.md)** for the full Ghidra reverse-engineering breakdown.
 
 ## Status
 
-- ✅ VCDS 26.3 ARM64 binary analyzed (Ghidra 11.2.1 + JDK 21)
-- ✅ Validation function identified: `FUN_140076ff0` at file offset `0x763F0`
-- ✅ Patch verified: `MOV X0,#0; RET` replaces function prologue
-- ✅ Patcher script stable and idempotent (vcds_loader.py)
-- 📁 Full documentation in `docs/`
+| Item | Status |
+|------|:---:|
+| ARM64 VCDS 26.3 analysis | ✅ Ghidra 11.2.1 |
+| Validation function found | ✅ `FUN_140076ff0` |
+| Patch applied | ✅ `MOV X0,#0; RET` at file 0x763F0 |
+| Tested on Snapdragon X | ✅ Working |
+| FTDI ARM64 driver | ✅ v2.12.36.20 WHQL |
+| HEX-V2 / HEX-NET support | ✅ Plug & play |
 
-## License & Disclaimer
+## Disclaimer
 
 For educational and research purposes only. VCDS is a registered trademark of Ross-Tech, LLC. Users must own a valid license.
-
-## Drivers
-
-**FTDI ARM64 VCP driver** (for legacy HEX-USB, Micro-CAN, KII-USB, KEY-USB, and FTDI-based clones):
-
-- 📦 `drivers/CDM-v2.12.36.20-for-ARM64-WHQL-Certified.zip`
-- See **[drivers/README.md](drivers/README.md)** for installation and cable compatibility
-
-**HEX-V2 and HEX-NET** users: no drivers needed! HEX-V2 uses HID (plug & play on ARM64), HEX-NET uses WiFi.
-
-## Status: VERIFIED WORKING on Snapdragon X (2026-07-06)
-
-ARM64 VCDS 26.3 launches successfully after patch. License bypass at FUN_140076ff0 confirmed.
