@@ -20,9 +20,11 @@
 
 ## 🚀 Quick Start
 
-1. **Drop** `VCDS ARM64 Patched.exe` into your VCDS 26.3 ARM64 installation folder.
-2. **Install** the FTDI ARM64 driver via Device Manager → "Have Disk" if using a USB cable.
-3. **Launch** — connect cable, select COM port, done.
+1. **Download** the latest VCDS installer from Ross-Tech:  
+   🔗 **[ross-tech.com/vcds/download/](https://www.ross-tech.com/vcds/download/)** — installs the native ARM64 build automatically (since Release 22.3).
+2. **Drop** `VCDS ARM64 Patched.exe` into your VCDS 26.3 ARM64 installation folder.
+3. **Install** the FTDI ARM64 driver via Device Manager → "Have Disk" if using a USB cable.
+4. **Launch** — connect cable, select COM port, done.
 
 ---
 
